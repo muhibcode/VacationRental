@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Amenities;
 use App\Models\BedRooms;
+use App\Models\ListingImage;
 use App\Models\Rental;
 use App\Models\RentalAmenities;
 use App\Models\UserProfile;
@@ -152,6 +153,23 @@ class RentalController extends Controller
 
         }
 
+        if ($request->hasFile('images')) {
+
+            $images = $request->file('images');
+            # code...
+            foreach ($images as $image) {
+                # code...
+                $img_name = hexdec(uniqid()) . '.' . $image->getClientOriginalExtension();
+
+                // $image->move('storage/images');
+                $path = $image->storeAs('images', $img_name, 'public');
+
+                ListingImage::create([
+                    'filename' => $path,
+                    'rental_id' => $request->rental
+                ]);
+            }
+        }
 
 
 
@@ -208,7 +226,7 @@ class RentalController extends Controller
 
 
 
-        return redirect()->route('image.create', ['rental' => $rental]);
+        return redirect()->route('rental.index', ['rental' => $rental]);
     }
 
     /**
@@ -232,7 +250,8 @@ class RentalController extends Controller
             // 'cost'
         ];
         $rental = Rental::where('id', '=', $id)
-            ->with(['bookings', 'images', 'bedrooms', 'owner.user'])->first();
+            ->with(['bookings', 'images', 'bedrooms', 'owner.user'])
+            ->first();
 
         return inertia('Rental/SingleRental', ['rental' => $rental, 'filters' => $filters]);
     }

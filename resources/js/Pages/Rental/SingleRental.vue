@@ -85,7 +85,10 @@
                             :disabled-dates="days"
                             :min-date="new Date()"
                             :enableTimePicker="false"
-                            :range="{ partialRange: false }"
+                            :range="{
+                                partialRange: false,
+                                noDisabledRange: true,
+                            }"
                             multi-calendars
                         />
                         <div class="flex items-center justify-start">
@@ -253,7 +256,7 @@
 
 <script setup>
 import { ref, computed, onMounted } from "vue";
-import { useForm } from "@inertiajs/vue3";
+import { router, useForm } from "@inertiajs/vue3";
 import VueDatePicker from "@vuepic/vue-datepicker";
 import "@vuepic/vue-datepicker/dist/main.css";
 // import { echo } from "@/bootstrap";
@@ -274,7 +277,7 @@ const props = defineProps({
     rental: Object,
     filters: Object,
 });
-console.log($page.props.auth.user.id);
+// console.log($page.props.auth.user.id);
 
 const date = ref([]);
 const Difference_In_Days = ref(0);
@@ -282,15 +285,38 @@ const chin = ref(props.filters.checkin_date ?? "");
 const cout = ref(props.filters.checkout_date ?? "");
 
 onMounted(() => {
-    console.log(window.Echo);
-    window.Echo.channel("booking-notify").listen(".booking", (e) => {
-        // alert(e.mess);
-        msg.value = e.mess;
-        console.log(e);
-    });
+    // console.log(window.Echo);
+    // window.Echo.channel("booking-notify").listen(".booking", (e) => {
+    //     msg.value = e.mess;
+    //     console.log(e);
+    // });
     //     // const startDate = new Date();
     //     // const endDate = new Date(new Date().setDate(startDate.getDate() + 7));
     //     // date.value = [gCheckIn.value, gCheckOut.value];
+    if (props.rental.bookings.length > 0) {
+        props.rental.bookings.forEach((e) => {
+            const date1 = new Date(e["checkin_date"]);
+            const date2 = new Date(e["checkout_date"]);
+
+            const Difference_In_Time = date2.getTime() - date1.getTime();
+
+            const Difference_In_Days = Difference_In_Time / (1000 * 3600 * 24);
+            // const g = date1.toLocaleDateString()
+            // console.log(date1.getMonth() + 1);
+
+            for (let i = 0; i <= Difference_In_Days; i++) {
+                //    let day = date1.getDate() + i
+                let month = date1.getMonth();
+                let year = date1.getFullYear();
+                let d = new Date();
+                d.setDate(date1.getDate() + i);
+                d.setMonth(month);
+                d.setFullYear(year);
+                console.log(d);
+                days.push(d);
+            }
+        });
+    }
 });
 
 let days = [];
@@ -302,33 +328,35 @@ const Difference_In_Time = date2.getTime() - date1.getTime();
 Difference_In_Days.value = Difference_In_Time / (1000 * 3600 * 24);
 
 const form = useForm({
-    hmsg: "welcone bay new comer",
-    // checkin_date: props.filters.checkin_date ?? "",
-    // checkout_date: props.filters.checkout_date ?? "",
-    // noOfDays: Difference_In_Days.value,
-    // noOfChildren: Number(props.filters.noOfChildren ?? 0),
-    // noOfAdults: Number(props.filters.noOfAdults ?? 0),
-    // totalAmount: props.rental.tariff * Difference_In_Days.value ?? 0,
-    // rental: props.rental.id,
-    // tenant: props.filters.userID,
-    //owner:props.rental.owner
+    //hmsg: "welcone to app",
+    checkin_date: props.filters.checkin_date ?? "",
+    checkout_date: props.filters.checkout_date ?? "",
+    noOfDays: Difference_In_Days.value ?? 0,
+    noOfChildren: Number(props.filters.noOfChildren ?? 0),
+    noOfAdults: Number(props.filters.noOfAdults ?? 0),
+    totalAmount: props.rental.tariff * Difference_In_Days.value ?? 0,
+    rental: props.rental.id,
+    tenant: props.filters.userID,
+    // owner: props.rental.owner,
 });
 
 date.value = [form.checkin_date, form.checkout_date];
+date.value.sort((a, b) => a - b);
+
+console.log(date.value);
 
 form.totalAmount = computed(() => {
-    const date1 = new Date(form.checkin_date);
-    const date2 = new Date(form.checkout_date);
+    const date1 = new Date(date.value[0]);
+    const date2 = new Date(date.value[1]);
 
     const Difference_In_Time = date2.getTime() - date1.getTime();
 
     const Difference_In_Days = Difference_In_Time / (1000 * 3600 * 24);
+    form.noOfDays = Difference_In_Days;
 
     return props.rental.tariff * Difference_In_Days;
 
     // console.log(Difference_In_Days);
-
-    // form.noOfDays = Difference_In_Days;
 });
 
 // const booking=[
@@ -378,34 +406,15 @@ form.totalAmount = computed(() => {
 //  }
 
 // below is the disabled dates code
-if (props.rental.bookings.length > 0) {
-    props.rental.bookings.forEach((e) => {
-        const date1 = new Date(e["checkin_date"]);
-        const date2 = new Date(e["checkout_date"]);
 
-        const Difference_In_Time = date2.getTime() - date1.getTime();
-
-        const Difference_In_Days = Difference_In_Time / (1000 * 3600 * 24);
-        // const g = date1.toLocaleDateString()
-        // console.log(date1.getMonth() + 1);
-
-        for (let i = 0; i <= Difference_In_Days; i++) {
-            //    let day = date1.getDate() + i
-            let month = date1.getMonth();
-            let year = date1.getFullYear();
-            let d = new Date();
-            d.setDate(date1.getDate() + i);
-            d.setMonth(month);
-            d.setFullYear(year);
-            console.log(d);
-            days.push(d);
-        }
-    });
-}
 // console.log(days);
 
 const submit = () => {
-    form.get(route("booking.create"));
+    console.log(date.value);
+    form.checkin_date = date.value[0];
+    form.checkout_date = date.value[1];
+    form.post(route("booking.store"));
+    // router.reload();
 };
 
 const onRangeStart = (value) => {
@@ -418,6 +427,7 @@ const onRangeStart = (value) => {
 
 const onRangeEnd = (value) => {
     form.checkout_date = value.toLocaleDateString();
+
     // form.checkout_date = cout.value;
     //   alert(`Selected date in range is: ${value}`);
 };

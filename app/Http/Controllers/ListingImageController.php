@@ -44,6 +44,7 @@ class ListingImageController extends Controller
                 # code...
                 $img_name = hexdec(uniqid()) . '.' . $image->getClientOriginalExtension();
 
+                // $image->move('storage/images');
                 $path = $image->storeAs('images', $img_name, 'public');
 
                 ListingImage::create([

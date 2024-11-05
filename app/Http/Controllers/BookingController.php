@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Events\BookingNotify;
 use App\Events\BookingReserve;
 use App\Events\reservebook;
 use App\Models\Booking;
@@ -55,11 +56,8 @@ class BookingController extends Controller
     {
         $user_profile = UserProfile::where('user', '=', auth()->id())->first();
         // dd($user_profile->id);
-        $res = [
-            'name' => 'baalo shai'
-        ];
-        reservebook::dispatch($request->hmsg, $res);
 
+        // BookingNotify::dispatch($request->hmsg, $res);
         Booking::create([
             'checkin_date' => Carbon::parse($request->checkin_date),
             'checkout_date' => Carbon::parse($request->checkout_date),
@@ -73,12 +71,11 @@ class BookingController extends Controller
 
         ]);
 
-
         // Rental::where('id', '=', $request->rental)->update([
         //     'booking' => $booking->id
         // ]);
 
-        return redirect()->route('rental.index');
+        return to_route('booking.index');
     }
 
     /**
