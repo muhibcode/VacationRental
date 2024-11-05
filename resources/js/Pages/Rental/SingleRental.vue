@@ -328,7 +328,6 @@ const Difference_In_Time = date2.getTime() - date1.getTime();
 Difference_In_Days.value = Difference_In_Time / (1000 * 3600 * 24);
 
 const form = useForm({
-    //hmsg: "welcone to app",
     checkin_date: props.filters.checkin_date ?? "",
     checkout_date: props.filters.checkout_date ?? "",
     noOfDays: Difference_In_Days.value ?? 0,
@@ -410,11 +409,10 @@ form.totalAmount = computed(() => {
 // console.log(days);
 
 const submit = () => {
-    console.log(date.value);
+    //sorted dates to insert
     form.checkin_date = date.value[0];
     form.checkout_date = date.value[1];
     form.post(route("booking.store"));
-    // router.reload();
 };
 
 const onRangeStart = (value) => {
