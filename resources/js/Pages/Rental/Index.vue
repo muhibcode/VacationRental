@@ -1,5 +1,6 @@
 <template>
     <div>
+        <NavBar />
         <Headar :filters="filters" />
         <div class="flex justify-evenly mt-2">
             <div class="flex items-center border px-2 py-2">
@@ -23,7 +24,7 @@
                         Filter 0
                     </button>
                 </div> -->
-                <span class="material-symbols-outlined"> tune </span>
+                <span class="material-symbols-outlined">filter_alt</span>
                 <h3 class="font-bold">Filter: {{ form.filterCount }}</h3>
                 <!-- <button onclick="my_modal_1.showModal()">Filter</button> -->
                 <dialog id="my_modal_1" class="modal">
@@ -132,6 +133,7 @@
                 <div class="px-2 pt-2">
                     <div class="flex justify-between">
                         <div>
+                            <h1>{{ item.name }}</h1>
                             <h1>{{ item.city }}</h1>
                         </div>
                         <div class="flex pr-1">
@@ -263,6 +265,7 @@ import Headar from "@/Components/Headar.vue";
 
 import { ref, onMounted } from "vue";
 import axios from "axios";
+import NavBar from "../TopBar/NavBar.vue";
 
 const props = defineProps({
     rentals: Object,

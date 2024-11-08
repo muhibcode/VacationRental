@@ -19,7 +19,7 @@
         </div>
         <div>
             <div class="flex">
-                <div class="w-60 h-60 mr-1">
+                <div class="w-60 h-60 mr-0.5">
                     <img
                         :src="props.rental.images[0]['src']"
                         alt=""
@@ -35,14 +35,14 @@
                 </div>
             </div>
             <div class="flex">
-                <div class="w-60 h-60 mr-1 mt-1">
+                <div class="w-60 h-60 mr-0.5 mt-0.5">
                     <img
                         :src="props.rental.images[0]['src']"
                         alt=""
                         class="w-full h-full"
                     />
                 </div>
-                <div class="w-60 h-60 mt-1 rounded-br-lg">
+                <div class="w-60 h-60 mt-0.5 rounded-br-lg">
                     <img
                         :src="props.rental.images[0]['src']"
                         alt=""

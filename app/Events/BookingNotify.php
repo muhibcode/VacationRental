@@ -17,9 +17,10 @@ class BookingNotify
     /**
      * Create a new event instance.
      */
-    public function __construct()
+    public $message;
+    public function __construct($m)
     {
-        //
+        $this->message = $m;
     }
 
     /**
@@ -27,10 +28,14 @@ class BookingNotify
      *
      * @return array<int, \Illuminate\Broadcasting\Channel>
      */
+    public function broadcastAs(): string
+    {
+        return 'booking';
+    }
     public function broadcastOn(): array
     {
         return [
-            new PrivateChannel('channel-name'),
+            new PrivateChannel('booking_notification'),
         ];
     }
 }

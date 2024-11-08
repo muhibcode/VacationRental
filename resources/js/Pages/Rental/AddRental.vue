@@ -114,12 +114,13 @@
         <button :onclick="makeRooms">Add Rooms</button>
         <div v-for="(item, index) in roomArr" :key="index">
             <h1>Room # {{ index + 1 }}</h1>
-            <h1>Total Beds in Room#{{ index + 1 }}:{{ noOfBeds }}</h1>
+            <h1>{{ form.noOfBeds[index] }} Beds in Room # {{ index + 1 }}</h1>
 
             <button :onclick="() => makeBeds(index)">Add Beds</button>
             <div v-for="(item, j) in form.bedType[index]" :key="j">
                 <div class="mt-5">
                     <InputLabel for="bedtype" value="BedType of room #" />
+                    <!-- have to give order list here -->
                     <input
                         :id="j"
                         type="text"
@@ -156,7 +157,7 @@ import { useForm } from "@inertiajs/vue3";
 let roomArr = ref([]);
 let bedArr = ref([]);
 
-let noOfBeds = 0;
+let noOfBeds = ref(0);
 let noOfRooms = 0;
 let amenity = [];
 let bedType = "";
